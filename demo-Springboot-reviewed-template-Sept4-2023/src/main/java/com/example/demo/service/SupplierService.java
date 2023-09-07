@@ -29,7 +29,7 @@ public class SupplierService {
     private final SupplierRepository supplierRepository;
 
 
-   @Autowired
+    @Autowired
     public SupplierService(SupplierRepository supplierRepository, MessageSource messageSource) {
         this.supplierRepository = supplierRepository;
     }
@@ -69,12 +69,10 @@ public class SupplierService {
             Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
 
 
-            // Try to load the ResourceBundle for the specified locale
             ResourceBundle messages;
             try {
                 messages = ResourceBundle.getBundle("i18n/messages", locale);
             } catch (MissingResourceException e) {
-                // If the ResourceBundle is not found, use the default ResourceBundle
                 messages = ResourceBundle.getBundle("messages_default", Locale.getDefault());
             }
 
