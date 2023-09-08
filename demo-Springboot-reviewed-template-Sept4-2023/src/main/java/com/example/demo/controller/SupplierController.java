@@ -64,8 +64,6 @@ public class SupplierController {
     @GetMapping("/export-pdf")
     public ResponseEntity<Void> exportSuppliersToPDF(HttpServletResponse response, @RequestParam(name = "lang", required = false, defaultValue = "en") String language) throws IOException, DocumentException {
         Locale locale = new Locale(language);
-        response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "attachment; filename=supplier_list.pdf");
         supplierService.generateSupplierListPDF(response, locale);
         return ResponseEntity.ok().build();
     }
