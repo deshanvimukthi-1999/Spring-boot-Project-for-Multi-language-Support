@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -58,39 +57,35 @@ public class SupplierService {
     }
     
 
-    public byte[] generateSupplierListPDF(Locale locale) throws IOException, DocumentException {
+    public void generateSupplierListPDF(OutputStream outputStream, Locale locale) throws DocumentException {
         List<SupplierOutputDTO> suppliers = getAllSuppliers();
-
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            Document document = new Document();
-            PdfWriter.getInstance(document, outputStream);
-            document.open();
-
-            Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
-
-
-            ResourceBundle messages;
-            try {
-                messages = ResourceBundle.getBundle("i18n/messages", locale);
-            } catch (MissingResourceException e) {
-                messages = ResourceBundle.getBundle("messages_default", Locale.getDefault());
-            }
-
-            for (SupplierOutputDTO supplier : suppliers) {
-                Paragraph paragraph = new Paragraph();
-                paragraph.setFont(font);
-                paragraph.add(messages.getString("supplier.id") + ": " + supplier.getId() + "\n");
-                paragraph.add(messages.getString("supplier.name") + ": " + supplier.getName() + "\n");
-                paragraph.add(messages.getString("supplier.contact") + ": " + supplier.getContactDetails() + "\n");
-                paragraph.add(messages.getString("supplier.address") + ": " + supplier.getAddress() + "\n");
-                paragraph.add(messages.getString("supplier.specialties") + ": " + supplier.getSpecialties() + "\n");
-                paragraph.add("\n");
-                document.add(paragraph);
-            }
-
-            document.close();
-
-            return outputStream.toByteArray();
+    
+        Document document = new Document();
+        PdfWriter.getInstance(document, outputStream);
+        document.open();
+    
+        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
+    
+        ResourceBundle messages;
+        try {
+            messages = ResourceBundle.getBundle("i18n/messages", locale);
+        } catch (MissingResourceException e) {
+            messages = ResourceBundle.getBundle("messages_default", Locale.getDefault());
         }
+    
+        for (SupplierOutputDTO supplier : suppliers) {
+            Paragraph paragraph = new Paragraph();
+            paragraph.setFont(font);
+            paragraph.add(messages.getString("supplier.id") + ": " + supplier.getId() + "\n");
+            paragraph.add(messages.getString("supplier.name") + ": " + supplier.getName() + "\n");
+            paragraph.add(messages.getString("supplier.contact") + ": " + supplier.getContactDetails() + "\n");
+            paragraph.add(messages.getString("supplier.address") + ": " + supplier.getAddress() + "\n");
+            paragraph.add(messages.getString("supplier.specialties") + ": " + supplier.getSpecialties() + "\n");
+            paragraph.add("\n");
+            document.add(paragraph);
+        }
+    
+        document.close();
     }
+    
 }

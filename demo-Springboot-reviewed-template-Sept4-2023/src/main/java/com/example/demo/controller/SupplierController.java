@@ -1,16 +1,13 @@
 package com.example.demo.controller;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +24,7 @@ import com.example.demo.dto.SupplierOutputDTO;
 import com.example.demo.service.SupplierService;
 import com.itextpdf.text.DocumentException;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @RestController
@@ -64,28 +62,18 @@ public class SupplierController {
         return ResponseEntity.noContent().build();
     }
 
+
     @GetMapping("/export-pdf")
-    public ResponseEntity<ByteArrayResource> exportSuppliersToPDF(@RequestParam(name = "lang", required = false, defaultValue = "en") String language) {
-        try {
-            Locale locale = new Locale(language);
-            byte[] pdfBytes = supplierService.generateSupplierListPDF(locale);
-            ByteArrayResource resource = new ByteArrayResource(pdfBytes);
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=supplier_list.pdf");
+    public ResponseEntity<Void> exportSuppliersToPDF(HttpServletResponse response, @RequestParam(name = "lang", required = false, defaultValue = "en") String language) throws IOException, DocumentException {
+        Locale locale = new Locale(language);
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=supplier_list.pdf");
+        OutputStream outputStream = response.getOutputStream();
+        supplierService.generateSupplierListPDF(outputStream, locale);
+        outputStream.flush();
+        outputStream.close();
 
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .contentLength(pdfBytes.length)
-                    .contentType(MediaType.APPLICATION_PDF)
-                    .body(resource);
-        } catch (IOException | DocumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @RequestMapping(value = {"/", "supplier-list"})
-    public String staticResource(Model model) {
-        return "supplier-list";
+        return ResponseEntity.ok().build();
     }
 
 }

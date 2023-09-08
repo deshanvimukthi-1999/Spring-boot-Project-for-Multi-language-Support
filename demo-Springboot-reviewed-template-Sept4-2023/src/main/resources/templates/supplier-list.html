@@ -62,6 +62,8 @@
         <a th:href="@{/supplier-list?lang=es}">Española</a>
         &nbsp;|&nbsp;
         <a th:href="@{/supplier-list?lang=ar}">عربي</a>
+        &nbsp;|&nbsp;
+        <a th:href="@{/supplier-list?lang=nl}">Nederlands</a>
     </div>
 
     <h1 th:text="#{table.title}">Supplier Management</h1>
@@ -85,6 +87,7 @@
     <a th:href="@{/api/suppliers/export-pdf(lang='en')}" th:text="#{download.pdf.en}" class="pdf-link">Download PDF (English)</a>
     <a th:href="@{/api/suppliers/export-pdf(lang='es')}" th:text="#{download.pdf.es}" class="pdf-link">Descargar PDF (Español)</a>
     <a th:href="@{/api/suppliers/export-pdf(lang='ar')}" th:text="#{download.pdf.ar}" class="pdf-link">تحميل PDF (العربية)</a>
+    <a th:href="@{/api/suppliers/export-pdf(lang='nl')}" th:text="#{download.pdf.nl}" class="pdf-link">Download PDF (Nederlands)</a>
 
     <script>
        function populateSupplierData() {
