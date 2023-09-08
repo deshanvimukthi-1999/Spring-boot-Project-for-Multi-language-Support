@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Locale;
@@ -21,6 +22,8 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class SupplierService {
@@ -57,35 +60,39 @@ public class SupplierService {
     }
     
 
-    public void generateSupplierListPDF(OutputStream outputStream, Locale locale) throws DocumentException {
+    public void generateSupplierListPDF(HttpServletResponse response, Locale locale) throws IOException, DocumentException {
         List<SupplierOutputDTO> suppliers = getAllSuppliers();
-    
-        Document document = new Document();
-        PdfWriter.getInstance(document, outputStream);
-        document.open();
-    
-        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
-    
-        ResourceBundle messages;
-        try {
-            messages = ResourceBundle.getBundle("i18n/messages", locale);
-        } catch (MissingResourceException e) {
-            messages = ResourceBundle.getBundle("messages_default", Locale.getDefault());
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=supplier_list.pdf");
+
+        try (OutputStream outputStream = response.getOutputStream()) {
+            Document document = new Document();
+            PdfWriter.getInstance(document, outputStream);
+            document.open();
+
+            Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
+
+            ResourceBundle messages;
+            try {
+                messages = ResourceBundle.getBundle("i18n/messages", locale);
+            } catch (MissingResourceException e) {
+                messages = ResourceBundle.getBundle("messages_default", Locale.getDefault());
+            }
+
+            for (SupplierOutputDTO supplier : suppliers) {
+                Paragraph paragraph = new Paragraph();
+                paragraph.setFont(font);
+                paragraph.add(messages.getString("supplier.id") + ": " + supplier.getId() + "\n");
+                paragraph.add(messages.getString("supplier.name") + ": " + supplier.getName() + "\n");
+                paragraph.add(messages.getString("supplier.contact") + ": " + supplier.getContactDetails() + "\n");
+                paragraph.add(messages.getString("supplier.address") + ": " + supplier.getAddress() + "\n");
+                paragraph.add(messages.getString("supplier.specialties") + ": " + supplier.getSpecialties() + "\n");
+                paragraph.add("\n");
+                document.add(paragraph);
+            }
+
+            document.close();
         }
-    
-        for (SupplierOutputDTO supplier : suppliers) {
-            Paragraph paragraph = new Paragraph();
-            paragraph.setFont(font);
-            paragraph.add(messages.getString("supplier.id") + ": " + supplier.getId() + "\n");
-            paragraph.add(messages.getString("supplier.name") + ": " + supplier.getName() + "\n");
-            paragraph.add(messages.getString("supplier.contact") + ": " + supplier.getContactDetails() + "\n");
-            paragraph.add(messages.getString("supplier.address") + ": " + supplier.getAddress() + "\n");
-            paragraph.add(messages.getString("supplier.specialties") + ": " + supplier.getSpecialties() + "\n");
-            paragraph.add("\n");
-            document.add(paragraph);
-        }
-    
-        document.close();
     }
-    
 }

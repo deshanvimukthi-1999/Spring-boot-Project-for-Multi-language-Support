@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.Locale;
 
@@ -61,18 +60,13 @@ public class SupplierController {
         supplierService.deleteSupplier(id);
         return ResponseEntity.noContent().build();
     }
-
-
+        
     @GetMapping("/export-pdf")
     public ResponseEntity<Void> exportSuppliersToPDF(HttpServletResponse response, @RequestParam(name = "lang", required = false, defaultValue = "en") String language) throws IOException, DocumentException {
         Locale locale = new Locale(language);
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename=supplier_list.pdf");
-        OutputStream outputStream = response.getOutputStream();
-        supplierService.generateSupplierListPDF(outputStream, locale);
-        outputStream.flush();
-        outputStream.close();
-
+        supplierService.generateSupplierListPDF(response, locale);
         return ResponseEntity.ok().build();
     }
 
